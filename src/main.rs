@@ -1,13 +1,7 @@
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
-use std::{env, path::Path};
+use std::path::Path;
 
 fn main() {
-    // Info
-    let os = env::var("OS").unwrap_or_else(|_| "unknown".to_string());
-    let arch = env::var("PROCESSOR_ARCHITECTURE").unwrap_or_else(|_| "unknown".to_string());
-    println!("OS: {}", os);
-    println!("Architecture: {}", arch);
-
     // let path: String = String::from(".");
     let path = std::env::args()
         .nth(1)
