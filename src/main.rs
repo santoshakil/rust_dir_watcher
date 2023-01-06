@@ -2,7 +2,10 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 
 fn main() {
-    let path: String = String::from(".");
+    // let path: String = String::from(".");
+    let path: String = std::env::args()
+        .nth(1)
+        .expect("Argument 1 needs to be a path");
     println!("watching {}", path);
     if let Err(e) = watch(path) {
         println!("error: {:?}", e)
