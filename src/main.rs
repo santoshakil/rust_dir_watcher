@@ -17,14 +17,14 @@ fn main() {
 }
 
 fn watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
-    let (tx, rx) = channel();
+    let (sp, rp) = channel();
 
-    let mut watcher = RecommendedWatcher::new(tx, Config::default())?;
+    let mut watcher = RecommendedWatcher::new(sp, Config::default())?;
 
     watcher.watch(path.as_ref(), RecursiveMode::Recursive)?;
 
     let handle = thread::spawn(move || {
-        while let Ok(event) = rx.recv() {
+        while let Ok(event) = rp.recv() {
             handle_event(&event).unwrap();
         }
     });
