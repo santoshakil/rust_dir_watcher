@@ -2,7 +2,6 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 
 fn main() {
-    // let path: String = String::from(".");
     let path = std::env::args()
         .nth(1)
         .expect("Argument 1 needs to be a path");
