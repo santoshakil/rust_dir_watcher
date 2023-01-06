@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "FSW",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=file_system_watcher",
+          "--package=file_system_watcher"
+        ],
+        "filter": {
+          "name": "file_system_watcher",
+          "kind": "bin"
+        }
+      },
+      "args": ["."],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
