@@ -1,5 +1,7 @@
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
+use std::sync::mpsc::channel;
+use std::thread;
 
 fn main() {
     let path = std::env::args()
@@ -14,17 +16,40 @@ fn main() {
 }
 
 fn watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
-    let (tx, rx) = std::sync::mpsc::channel();
+    let (tx, rx) = channel();
 
     let mut watcher = RecommendedWatcher::new(tx, Config::default())?;
 
     watcher.watch(path.as_ref(), RecursiveMode::Recursive)?;
 
-    for res in rx {
-        match res {
-            Ok(event) => println!("Event: {:?}", event),
-            Err(e) => println!("Error: {:?}", e),
+    let handle = thread::spawn(move || {
+        while let Ok(event) = rx.recv() {
+            handle_event(&event).unwrap();
         }
+    });
+
+    handle.join().unwrap();
+
+    Ok(())
+}
+
+fn handle_event(data: &Result<notify::Event, notify::Error>) -> notify::Result<()> {
+    let event = data.as_ref().unwrap();
+    let path = match event.paths.first() {
+        Some(path) => path,
+        None => return Ok(()),
+    };
+
+    if event.kind.is_create() {
+        println!("File created: {:?}", path);
+    } else if event.kind.is_modify() {
+        println!("File modified: {:?}", path);
+    } else if event.kind.is_remove() {
+        println!("File removed: {:?}", path);
+    } else if event.kind.is_access() {
+        println!("File accessed: {:?}", path);
+    } else {
+        println!("Other event: {:?}", path);
     }
 
     Ok(())
