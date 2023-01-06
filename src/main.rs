@@ -1,7 +1,8 @@
-use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 use std::sync::mpsc::channel;
 use std::thread;
+
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 fn main() {
     let path = std::env::args()
