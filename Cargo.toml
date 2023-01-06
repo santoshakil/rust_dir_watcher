@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 notify = "5.0.0"
+# crossbeam-channel = "0.5.6"
