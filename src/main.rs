@@ -1,6 +1,6 @@
-use std::path::Path;
 use std::sync::mpsc::channel;
 use std::thread;
+use std::{path::Path, time::SystemTime};
 
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
@@ -25,7 +25,7 @@ fn watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
 
     let handle = thread::spawn(move || {
         while let Ok(event) = rp.recv() {
-            handle_event(&event).unwrap();
+            handle_event(&event.unwrap()).unwrap();
         }
     });
 
@@ -34,24 +34,24 @@ fn watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
     Ok(())
 }
 
-fn handle_event(data: &Result<notify::Event, notify::Error>) -> notify::Result<()> {
-    let event = data.as_ref().unwrap();
-    let path = match event.paths.first() {
-        Some(path) => path,
-        None => return Ok(()),
-    };
+fn handle_event(event: &notify::Event) -> notify::Result<()> {
+    let id = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_millis();
 
     if event.kind.is_create() {
-        println!("File created: {:?}", path);
+        println!("{}: File created", id);
     } else if event.kind.is_modify() {
-        println!("File modified: {:?}", path);
+        println!("{}: File modified", id);
     } else if event.kind.is_remove() {
-        println!("File removed: {:?}", path);
+        println!("{}: File removed", id);
     } else if event.kind.is_access() {
-        println!("File accessed: {:?}", path);
+        println!("{}: File accessed", id);
     } else {
-        println!("Other event: {:?}", path);
+        println!("{}: Other event", id);
     }
+    println!("{:?}", event);
 
     Ok(())
 }
